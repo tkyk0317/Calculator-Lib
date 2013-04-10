@@ -12,27 +12,38 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.EditText;
 import android.view.Gravity;
-import android.widget.Button;
+
+import com.mylib.calculator.CalculatorLine;
+import com.mylib.calculator.CalculatorSecondLine;
+import com.mylib.calculator.CalculatorThirdLine;
+import com.mylib.calculator.CalculatorFourthLine;
+import com.mylib.calculator.CalculatorFifthLine;
+import com.mylib.calculator.CalculatorCell;
+import com.mylib.calculator.CalculatorCellId;
+import com.mylib.calculator.observer.ClickObserverInterface;
 
 /**
  * @brief Calculator Class.
  */
-public class Calculator {
+public class Calculator implements ClickObserverInterface {
 
     private Activity activity = null;
     private AlertDialog calculatorDialog = null;
     private LinearLayout calculatorLayout = null;
     private TextView calculatorTextView = null;
-    private EditText calculatorValue = null;
-    private List<CalculatorCell> calculatorCells = null;
-    private List<RelativeLayout> calculatorRelativeLayout = null;
+    private EditText calculatorEdit = null;
+    private String displayCalculateLeft = null;
+    private String displayCalculateRight = null;
+    private int calculateLeftValue = 0;
+    private int calculateRightValue = 0;
+    private List<CalculatorLine> calculatorLine = null;
+    private CalculatorInputMode inputMode = CalculatorInputMode.INPUT_MODE_LEFT;
+    private CalculatorOperation calculatorOperation = CalculatorOperation.UNKNOWN;
+
     private static final String DEFAULT_TITLE = "電卓";
     private static final int VERTICAL = 1;
     private static final int DEFAULT_TITLE_SIZE = 24;
     private static final int CALCULATOR_TEXT_SIZE = 24;
-    private static final int CALCULATOR_ROW_NUM = 5;
-    private static final int CALCULATOR_COLUMN_NUM = 4;
-    private static final int CALCULATOR_BUTTON_WIDTH = 60;
     private static final int CALCULATOR_VALUE_LENGTH = 10;
     private static final int CALCULATOR_PADDING = 10;
 
@@ -69,13 +80,11 @@ public class Calculator {
      */
     private void createCalculatorResources() {
         this.calculatorDialog = new AlertDialog.Builder(this.activity).create();
+        this.displayCalculateLeft = new String();
+        this.displayCalculateRight = new String();
 
         // create layout.
         createLayout();
-
-        // create calculator.
-        createLayoutIncludeCalculatorCell();
-        createCalculatorCells();
 
         // set title.
         setCalculatorTitle(DEFAULT_TITLE);
@@ -90,14 +99,17 @@ public class Calculator {
     private void createLayout() {
         this.calculatorLayout = new LinearLayout(this.activity);
         this.calculatorTextView = new TextView(this.activity);
-        this.calculatorValue = new EditText(this.activity);
+        this.calculatorEdit = new EditText(this.activity);
 
         // set meta data.
         setMetaData();
 
         // add view.
         this.calculatorLayout.addView(this.calculatorTextView);
-        this.calculatorLayout.addView(this.calculatorValue);
+        this.calculatorLayout.addView(this.calculatorEdit);
+
+        // create each line.
+        createEachLine();
     }
 
     /**
@@ -114,77 +126,157 @@ public class Calculator {
         this.calculatorTextView.setTextSize(DEFAULT_TITLE_SIZE);
 
         // value view.
-        this.calculatorValue.setTextSize(CALCULATOR_TEXT_SIZE);
-        this.calculatorValue.setWidth(LayoutParams.MATCH_PARENT);
-        this.calculatorValue.setMaxWidth(CALCULATOR_VALUE_LENGTH);
-        this.calculatorValue.setPadding(0, CALCULATOR_PADDING, 0, CALCULATOR_PADDING);
-        this.calculatorValue.setFocusable(false);
-        this.calculatorValue.setClickable(false);
-        this.calculatorValue.setLongClickable(false);
+        this.calculatorEdit.setTextSize(CALCULATOR_TEXT_SIZE);
+        this.calculatorEdit.setWidth(LayoutParams.MATCH_PARENT);
+        this.calculatorEdit.setMaxWidth(CALCULATOR_VALUE_LENGTH);
+        this.calculatorEdit.setGravity(Gravity.RIGHT);
+        this.calculatorEdit.setPadding(0, CALCULATOR_PADDING, 0, CALCULATOR_PADDING);
+        this.calculatorEdit.setFocusable(false);
+        this.calculatorEdit.setClickable(false);
+        this.calculatorEdit.setLongClickable(false);
     }
 
     /**
-     * @brief Create Layout Instances include CalculatorCell.
+     * @brief Create Each Line.
      */
-    private void createLayoutIncludeCalculatorCell() {
-        this.calculatorRelativeLayout = new ArrayList<RelativeLayout>();
+    private void createEachLine() {
+        this.calculatorLine = new ArrayList<CalculatorLine>();
+        this.calculatorLine.add(new CalculatorLine(this.activity, this.calculatorLayout));
+        this.calculatorLine.add(new CalculatorSecondLine(this.activity, this.calculatorLayout));
+        this.calculatorLine.add(new CalculatorThirdLine(this.activity, this.calculatorLayout));
+        this.calculatorLine.add(new CalculatorFourthLine(this.activity, this.calculatorLayout));
+        this.calculatorLine.add(new CalculatorFifthLine(this.activity, this.calculatorLayout));
 
-        for( int i = 0 ; i < CALCULATOR_ROW_NUM ; ++i ) {
-            RelativeLayout relative_layout = new RelativeLayout(this.activity);
-
-            // set layout params.
-            LayoutParams layout_params = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-
-            // add layout.
-            this.calculatorRelativeLayout.add(relative_layout);
-            this.calculatorLayout.addView(relative_layout);
+        // attach.
+        for( CalculatorLine line : this.calculatorLine ) {
+            line.attachObserver(this);
         }
     }
 
     /**
-     * @brief Create Calculator Cells.
+     * @brief Notify Click Event.
+     *
+     * @param event CalculatorCell Instance.
      */
-    private void createCalculatorCells() {
-        this.calculatorCells = new ArrayList<CalculatorCell>();
+    @Override
+    public void notifyClick(Object event) {
+        parseClickEvent((CalculatorCell)event);
+    }
 
-        for( int i = 0 ; i < CALCULATOR_COLUMN_NUM * CALCULATOR_ROW_NUM ; ++i ) {
-            CalculatorCell calculator_cell =  new CalculatorCell(this.activity);
-            calculator_cell.setId(i);
+    /**
+     * @brief Parse Click Event.
+     *
+     * @param cell CalculatorCell Instance.
+     */
+    private void parseClickEvent(CalculatorCell cell) {
+        int id = cell.getId();
 
-            // set meta data.
-            RelativeLayout.LayoutParams layout_params = new RelativeLayout.LayoutParams(CALCULATOR_BUTTON_WIDTH, RelativeLayout.LayoutParams.WRAP_CONTENT);
-            if( 0 != i ) {
-                // child align right.
-                layout_params.addRule(RelativeLayout.RIGHT_OF, i - 1);
-            }
-
-            // set text value.
-            calculator_cell.setText(String.valueOf(i));
-
-            // add relative layout.
-            int index = i / CALCULATOR_COLUMN_NUM;
-            this.calculatorCells.add(calculator_cell);
-            this.calculatorRelativeLayout.get(index).addView(calculator_cell, layout_params);
+        if( id <= CalculatorCellId.ID_DOUBLE_ZERO.getCellId() ) {
+            displayInputValue(cell);
+        } else if( CalculatorCellId.ID_AC.getCellId() == id ) {
+            // clcik ac button.
+            clearCalculatorValue();
+        } else if( CalculatorCellId.ID_CLEAR.getCellId() == id ) {
+            // click clear button.
+            this.calculateRightValue = 0;
+        } else if( CalculatorCellId.ID_PLUS.getCellId() == id ) {
+            // click plus button.
+            transitionInputMode();
+            this.calculatorOperation = CalculatorOperation.PLUS;
+        } else if( CalculatorCellId.ID_MINUS.getCellId() == id ) {
+            // click minus button.
+            transitionInputMode();
+            this.calculatorOperation = CalculatorOperation.MINUS;
+        } else if( CalculatorCellId.ID_MULTIPLE.getCellId() == id ) {
+            // click multiple button.
+            transitionInputMode();
+            this.calculatorOperation = CalculatorOperation.MULTIPLE;
+        } else if( CalculatorCellId.ID_DIVISION.getCellId() == id ) {
+            // click division button.
+            transitionInputMode();
+            this.calculatorOperation = CalculatorOperation.DIVISION;
+        } else if( CalculatorCellId.ID_EQUAL.getCellId() == id ) {
+            // click equal button.
+            calculate();
+            this.displayCalculateLeft = "";
+            this.displayCalculateRight = "";
+            this.calculatorEdit.setText(String.format("%,d", this.calculateLeftValue));
+            this.calculatorOperation = CalculatorOperation.UNKNOWN;
         }
     }
 
     /**
-     * @brief Calculator Cell Class.
+     * @brief Display Input Value.
+     *
+     * @param cell CalculatorCell Instance.
      */
-    private class CalculatorCell extends Button {
+    private void displayInputValue(CalculatorCell cell) {
+        if( this.calculatorEdit.getText().toString().length() >= CALCULATOR_VALUE_LENGTH ) return;
 
-        private Activity activity = null;
-        private String displayString = null;
+        // get calculator text.
+        if( this.inputMode == CalculatorInputMode.INPUT_MODE_LEFT ) {
+            this.displayCalculateLeft += cell.getButtonText();
+            this.calculateLeftValue = Integer.valueOf(this.displayCalculateLeft);
 
-        /**
-         * @brief Consutractor.
-         *
-         * @param display_string display string.
-         */
-        public CalculatorCell(Activity activity) {
-            super(activity);
-            this.activity = activity;
+            // reflection edit text view.
+            this.calculatorEdit.setText(String.format("%,d", this.calculateLeftValue));
+        } else {
+            this.displayCalculateRight += cell.getButtonText();
+            this.calculateRightValue = Integer.valueOf(this.displayCalculateRight);
+
+            // reflection edit text view.
+            this.calculatorEdit.setText(String.format("%,d", this.calculateRightValue));
         }
+    }
+
+    /**
+     * @brief Clean Calculator Values.
+     */
+    private void clearCalculatorValue() {
+        this.displayCalculateLeft = "";
+        this.displayCalculateRight = "";
+        this.calculatorEdit.setText(this.displayCalculateLeft);
+        this.calculateLeftValue = 0;
+        this.calculateRightValue = 0;
+        this.inputMode = CalculatorInputMode.INPUT_MODE_LEFT;
+    }
+
+    /**
+     * @brief Transition Input Mode.
+     */
+    private void transitionInputMode() {
+        if( CalculatorInputMode.INPUT_MODE_LEFT == this.inputMode ) {
+            this.inputMode = CalculatorInputMode.INPUT_MODE_RIGHT;
+        }
+    }
+
+    /**
+     * @brief Calculate Process.
+     */
+    private void calculate() {
+        if( this.calculatorOperation == CalculatorOperation.PLUS ) {
+            this.calculateLeftValue += this.calculateRightValue;
+        } else if( this.calculatorOperation == CalculatorOperation.MINUS ) {
+            this.calculateLeftValue -= this.calculateRightValue;
+        } else if( this.calculatorOperation == CalculatorOperation.MULTIPLE ) {
+            this.calculateLeftValue *= this.calculateRightValue;
+        } else if( this.calculatorOperation == CalculatorOperation.DIVISION ) {
+            this.calculateLeftValue /= this.calculateRightValue;
+        }
+    }
+
+    /**
+     * @brief Input Mode Enum Class.
+     */
+    private enum CalculatorInputMode {
+        INPUT_MODE_LEFT, INPUT_MODE_RIGHT;
+    }
+
+    /**
+     * @brief Operation Enum Class.
+     */
+    private enum CalculatorOperation {
+        UNKNOWN, PLUS, MINUS, MULTIPLE, DIVISION;
     }
 }
 
