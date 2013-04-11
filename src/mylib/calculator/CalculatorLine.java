@@ -23,8 +23,8 @@ class CalculatorLine implements ClickObserverInterface {
     protected RelativeLayout lineLayout = null;
     protected List<CalculatorCell> calculatorCells = null;
     protected ClickObserverInterface observer = null;
-    protected static final int CALCULATOR_BUTTON_WIDTH = 80;
-    protected static final int CALCULATOR_TEXT_SIZE = 20;
+    protected static final int CALCULATOR_BUTTON_WIDTH = 70;
+    protected static final int CALCULATOR_BUTTON_TEXT_SIZE = 20;
     private static final String BUTTON_TEXT_ONE = "1";
     private static final String BUTTON_TEXT_TWO = "2";
     private static final String BUTTON_TEXT_THREE = "3";
@@ -64,7 +64,7 @@ class CalculatorLine implements ClickObserverInterface {
         LayoutParams layout_params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
         // add layout.
-        view.addView(this.lineLayout);
+        view.addView(this.lineLayout, layout_params);
     }
 
     /**
@@ -148,7 +148,7 @@ class CalculatorLine implements ClickObserverInterface {
      */
     protected void setButtonTextSize() {
         for( CalculatorCell cell : this.calculatorCells ) {
-            cell.setButtonTextSize(CALCULATOR_TEXT_SIZE);
+            cell.setButtonTextSize(CALCULATOR_BUTTON_TEXT_SIZE);
         }
     }
 
@@ -157,13 +157,13 @@ class CalculatorLine implements ClickObserverInterface {
      */
     protected void addIntoLayout() {
         RelativeLayout.LayoutParams params_one = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                                                                 RelativeLayout.LayoutParams.WRAP_CONTENT);
         params_one.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         this.lineLayout.addView(this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).getButtonView(), params_one);
 
         for( int i = 1 ; i < this.calculatorCells.size() ; ++i ) {
             RelativeLayout.LayoutParams layout_params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT);
+                                                                                        RelativeLayout.LayoutParams.WRAP_CONTENT);
             layout_params.addRule(RelativeLayout.RIGHT_OF, this.calculatorCells.get(i - 1).getId());
             this.lineLayout.addView(this.calculatorCells.get(i).getButtonView(), layout_params);
         }

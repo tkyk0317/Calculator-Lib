@@ -40,7 +40,6 @@ class CalculatorThirdLine extends CalculatorLine {
         this.calculatorCells.add(new CalculatorCell(this.activity));
         this.calculatorCells.add(new CalculatorCell(this.activity));
         this.calculatorCells.add(new CalculatorCell(this.activity));
-        this.calculatorCells.add(new CalculatorCell(this.activity));
     }
 
     /**

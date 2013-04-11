@@ -182,6 +182,7 @@ public class Calculator implements ClickObserverInterface {
         // value view.
         this.calculatorEdit.setTextSize(CALCULATOR_TEXT_SIZE);
         this.calculatorEdit.setWidth(LayoutParams.MATCH_PARENT);
+        this.calculatorEdit.setHeight(LayoutParams.MATCH_PARENT);
         this.calculatorEdit.setMaxWidth(CALCULATOR_VALUE_LENGTH);
         this.calculatorEdit.setGravity(Gravity.RIGHT);
         this.calculatorEdit.setPadding(0, CALCULATOR_PADDING, 0, CALCULATOR_PADDING);
