@@ -50,7 +50,7 @@ class CalculatorThirdLine extends CalculatorLine {
         this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setId(CalculatorCellId.ID_7.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setId(CalculatorCellId.ID_8.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setId(CalculatorCellId.ID_9.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.FIVE.getIndex()).setId(CalculatorCellId.ID_MULTIPLE.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_MULTIPLE.getCellId());
     }
 
     /**

@@ -20,6 +20,17 @@ import com.mylib.calculator.CalculatorFourthLine;
 import com.mylib.calculator.CalculatorFifthLine;
 import com.mylib.calculator.CalculatorCell;
 import com.mylib.calculator.CalculatorCellId;
+import com.mylib.calculator.OperationState;
+import com.mylib.calculator.OperationData;
+import com.mylib.calculator.OperationStateInterface;
+import com.mylib.calculator.OperationNormalStateImpl;
+import com.mylib.calculator.OperationPlusStateImpl;
+import com.mylib.calculator.OperationMinusStateImpl;
+import com.mylib.calculator.OperationMultipleStateImpl;
+import com.mylib.calculator.OperationDivisionStateImpl;
+import com.mylib.calculator.OperationAllClearStateImpl;
+import com.mylib.calculator.OperationClearStateImpl;
+import com.mylib.calculator.OperationEqualStateImpl;
 import com.mylib.calculator.observer.ClickObserverInterface;
 
 /**
@@ -32,20 +43,27 @@ public class Calculator implements ClickObserverInterface {
     private LinearLayout calculatorLayout = null;
     private TextView calculatorTextView = null;
     private EditText calculatorEdit = null;
-    private String displayCalculateLeft = null;
-    private String displayCalculateRight = null;
-    private int calculateLeftValue = 0;
-    private int calculateRightValue = 0;
     private List<CalculatorLine> calculatorLine = null;
-    private CalculatorInputMode inputMode = CalculatorInputMode.INPUT_MODE_LEFT;
-    private CalculatorOperation calculatorOperation = CalculatorOperation.UNKNOWN;
+    private ClickObserverInterface observer = null;
+    private OperationData operationData = new OperationData();
+    private OperationStateInterface currentOperationState = null;
+    private OperationStateInterface normalOperationState = new OperationNormalStateImpl(this.operationData);
+    private OperationStateInterface plusOperationState = new OperationPlusStateImpl(this.operationData);
+    private OperationStateInterface minusOperationState = new OperationMinusStateImpl(this.operationData);
+    private OperationStateInterface multipleOperationState = new OperationMultipleStateImpl(this.operationData);
+    private OperationStateInterface divisionOperationState = new OperationDivisionStateImpl(this.operationData);
+    private OperationStateInterface allClearOperationState = new OperationAllClearStateImpl(this.operationData);
+    private OperationStateInterface clearOperationState = new OperationClearStateImpl(this.operationData);
+    private OperationStateInterface equalOperationState = new OperationEqualStateImpl(this.operationData);
 
     private static final String DEFAULT_TITLE = "電卓";
+    private static final String ZERO = "0";
     private static final int VERTICAL = 1;
     private static final int DEFAULT_TITLE_SIZE = 24;
     private static final int CALCULATOR_TEXT_SIZE = 24;
     private static final int CALCULATOR_VALUE_LENGTH = 10;
     private static final int CALCULATOR_PADDING = 10;
+    private static final String CALCULATOR_MONEY_DELIMITER = ",";
 
     /**
      * @brief Constractor.
@@ -54,6 +72,7 @@ public class Calculator implements ClickObserverInterface {
      */
     public Calculator(Activity activity) {
         this.activity = activity;
+        this.currentOperationState = this.normalOperationState;
 
         // create resource.
         createCalculatorResources();
@@ -62,8 +81,42 @@ public class Calculator implements ClickObserverInterface {
     /**
      * @brief Appear the Calculator.
      */
-    public void appear() {
+    public void appear(String calculate_value) {
+        // set intialize value.
+        if( calculate_value.length() > 0 ) {
+            this.currentOperationState.setCalculateLeftValue(Integer.valueOf(calculate_value));
+        }
+        displayInputValue(calculate_value);
+        this.currentOperationState.setDisplayText(calculate_value);
+
+        // show calculator.
         this.calculatorDialog.show();
+    }
+
+    /**
+     * @brief Dismiss Calculator Dialog.
+     */
+    public void disAppear() {
+        this.calculatorDialog.dismiss();
+    }
+
+    /**
+     * @brief Get Display Text.
+     *
+     * @return display text string.
+     */
+    public String getDisplayText() {
+        String calculate_value = this.calculatorEdit.getText().toString();
+        return calculate_value.replaceAll(CALCULATOR_MONEY_DELIMITER, "");
+    }
+
+    /**
+     * @brief Attach Observer.
+     *
+     * @param observer ClickObserverInterface Instance.
+     */
+    public void attachObserver(ClickObserverInterface observer) {
+        this.observer = observer;
     }
 
     /**
@@ -80,14 +133,15 @@ public class Calculator implements ClickObserverInterface {
      */
     private void createCalculatorResources() {
         this.calculatorDialog = new AlertDialog.Builder(this.activity).create();
-        this.displayCalculateLeft = new String();
-        this.displayCalculateRight = new String();
 
         // create layout.
         createLayout();
 
         // set title.
         setCalculatorTitle(DEFAULT_TITLE);
+
+        // set default value.
+        displayInputValue(this.currentOperationState.getDisplayText());
 
         // add layout into dialog.
         this.calculatorDialog.setView(this.calculatorLayout);
@@ -160,123 +214,122 @@ public class Calculator implements ClickObserverInterface {
      */
     @Override
     public void notifyClick(Object event) {
-        parseClickEvent((CalculatorCell)event);
+        if( true == parseClickEvent((CalculatorCell)event) ) {
+            // reflection display.
+            displayInputValue(this.currentOperationState.getDisplayText());
+
+            // notify observer.
+            notifyObserver();
+
+            // clear innner display text value(ready next state).
+            if( true == isClearDisplayText((CalculatorCell)event) ) {
+                this.currentOperationState.clearDisplayText();
+            }
+            transitionOperationState();
+        }
     }
 
     /**
      * @brief Parse Click Event.
      *
      * @param cell CalculatorCell Instance.
+     *
+     * @return true:transition next state false:not transition next state.
      */
-    private void parseClickEvent(CalculatorCell cell) {
+    private boolean parseClickEvent(CalculatorCell cell) {
         int id = cell.getId();
+        boolean is_next_state = false;
 
         if( id <= CalculatorCellId.ID_DOUBLE_ZERO.getCellId() ) {
-            displayInputValue(cell);
+            // click number button.
+            is_next_state = this.currentOperationState.clickNumberEvent(cell);
         } else if( CalculatorCellId.ID_AC.getCellId() == id ) {
             // clcik ac button.
-            clearCalculatorValue();
+            is_next_state = this.currentOperationState.clickAllClearEvent(cell);
         } else if( CalculatorCellId.ID_CLEAR.getCellId() == id ) {
             // click clear button.
-            this.calculateRightValue = 0;
+            is_next_state = this.currentOperationState.clickClearEvent(cell);
         } else if( CalculatorCellId.ID_PLUS.getCellId() == id ) {
             // click plus button.
-            transitionInputMode();
-            this.calculatorOperation = CalculatorOperation.PLUS;
+            is_next_state = this.currentOperationState.clickPlusEvent(cell);
         } else if( CalculatorCellId.ID_MINUS.getCellId() == id ) {
             // click minus button.
-            transitionInputMode();
-            this.calculatorOperation = CalculatorOperation.MINUS;
+            is_next_state = this.currentOperationState.clickMinusEvent(cell);
         } else if( CalculatorCellId.ID_MULTIPLE.getCellId() == id ) {
             // click multiple button.
-            transitionInputMode();
-            this.calculatorOperation = CalculatorOperation.MULTIPLE;
+            is_next_state = this.currentOperationState.clickMultipleEvent(cell);
         } else if( CalculatorCellId.ID_DIVISION.getCellId() == id ) {
             // click division button.
-            transitionInputMode();
-            this.calculatorOperation = CalculatorOperation.DIVISION;
+            is_next_state = this.currentOperationState.clickDivisionEvent(cell);
         } else if( CalculatorCellId.ID_EQUAL.getCellId() == id ) {
             // click equal button.
-            calculate();
-            this.displayCalculateLeft = "";
-            this.displayCalculateRight = "";
-            this.calculatorEdit.setText(String.format("%,d", this.calculateLeftValue));
-            this.calculatorOperation = CalculatorOperation.UNKNOWN;
+            is_next_state = this.currentOperationState.clickEqualEvent(cell);
         }
+        return is_next_state;
     }
 
     /**
      * @brief Display Input Value.
      *
-     * @param cell CalculatorCell Instance.
+     * @param display_text displayed text string.
      */
-    private void displayInputValue(CalculatorCell cell) {
-        if( this.calculatorEdit.getText().toString().length() >= CALCULATOR_VALUE_LENGTH ) return;
-
-        // get calculator text.
-        if( this.inputMode == CalculatorInputMode.INPUT_MODE_LEFT ) {
-            this.displayCalculateLeft += cell.getButtonText();
-            this.calculateLeftValue = Integer.valueOf(this.displayCalculateLeft);
-
-            // reflection edit text view.
-            this.calculatorEdit.setText(String.format("%,d", this.calculateLeftValue));
+    private void displayInputValue(String display_text) {
+        // reflection edit text view.
+        if( display_text.length() > 0 ) {
+            this.calculatorEdit.setText(String.format("%,d", Integer.valueOf(display_text)));
         } else {
-            this.displayCalculateRight += cell.getButtonText();
-            this.calculateRightValue = Integer.valueOf(this.displayCalculateRight);
-
-            // reflection edit text view.
-            this.calculatorEdit.setText(String.format("%,d", this.calculateRightValue));
+            this.calculatorEdit.setText(ZERO);
         }
     }
 
     /**
-     * @brief Clean Calculator Values.
+     * @brief notify observer.
      */
-    private void clearCalculatorValue() {
-        this.displayCalculateLeft = "";
-        this.displayCalculateRight = "";
-        this.calculatorEdit.setText(this.displayCalculateLeft);
-        this.calculateLeftValue = 0;
-        this.calculateRightValue = 0;
-        this.inputMode = CalculatorInputMode.INPUT_MODE_LEFT;
+    private void notifyObserver() {
+        if( null != this.observer ) this.observer.notifyClick(this);
     }
 
     /**
-     * @brief Transition Input Mode.
+     * @brief Check Clear Display Text Timing.
      */
-    private void transitionInputMode() {
-        if( CalculatorInputMode.INPUT_MODE_LEFT == this.inputMode ) {
-            this.inputMode = CalculatorInputMode.INPUT_MODE_RIGHT;
+    private boolean isClearDisplayText(CalculatorCell cell) {
+        int id = cell.getId();
+
+        if( CalculatorCellId.ID_PLUS.getCellId() == id ||
+            CalculatorCellId.ID_MINUS.getCellId() == id ||
+            CalculatorCellId.ID_MULTIPLE.getCellId() == id ||
+            CalculatorCellId.ID_DIVISION.getCellId() == id ||
+            CalculatorCellId.ID_EQUAL.getCellId() == id ) {
+            return true;
         }
+        return false;
     }
 
     /**
-     * @brief Calculate Process.
+     * @brief Transition OperationState.
      */
-    private void calculate() {
-        if( this.calculatorOperation == CalculatorOperation.PLUS ) {
-            this.calculateLeftValue += this.calculateRightValue;
-        } else if( this.calculatorOperation == CalculatorOperation.MINUS ) {
-            this.calculateLeftValue -= this.calculateRightValue;
-        } else if( this.calculatorOperation == CalculatorOperation.MULTIPLE ) {
-            this.calculateLeftValue *= this.calculateRightValue;
-        } else if( this.calculatorOperation == CalculatorOperation.DIVISION ) {
-            this.calculateLeftValue /= this.calculateRightValue;
+    private void transitionOperationState() {
+        OperationState next_state = this.currentOperationState.getNextState();
+
+        if( next_state == OperationState.NORMAL ) {
+            this.currentOperationState = this.normalOperationState;
+        } else if( next_state == OperationState.PLUS ) {
+            this.currentOperationState = this.plusOperationState;
+        } else if( next_state == OperationState.MINUS ) {
+            this.currentOperationState = this.minusOperationState;
+        } else if( next_state == OperationState.MULTIPLE ) {
+            this.currentOperationState = this.multipleOperationState;
+        } else if( next_state == OperationState.DIVISION ) {
+            this.currentOperationState = this.divisionOperationState;
+        } else if( next_state == OperationState.CLEAR ) {
+            this.currentOperationState = this.clearOperationState;
+        } else if( next_state == OperationState.ALL_CLEAR ) {
+            this.currentOperationState = this.allClearOperationState;
+        } else if( next_state == OperationState.ALL_CLEAR ) {
+            this.currentOperationState = this.equalOperationState;
+        } else if( next_state == OperationState.EQUAL ) {
+            this.currentOperationState = this.equalOperationState;
         }
-    }
-
-    /**
-     * @brief Input Mode Enum Class.
-     */
-    private enum CalculatorInputMode {
-        INPUT_MODE_LEFT, INPUT_MODE_RIGHT;
-    }
-
-    /**
-     * @brief Operation Enum Class.
-     */
-    private enum CalculatorOperation {
-        UNKNOWN, PLUS, MINUS, MULTIPLE, DIVISION;
     }
 }
 
