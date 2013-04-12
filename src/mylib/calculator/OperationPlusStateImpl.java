@@ -54,7 +54,7 @@ class OperationPlusStateImpl extends OperationNormalStateImpl {
     public boolean clickPlusEvent(CalculatorCell cell) {
         calculate();
         this.operationData.setOperationNextState(OperationState.PLUS);
-        return false;
+        return true;
     }
 
     /**
@@ -130,7 +130,6 @@ class OperationPlusStateImpl extends OperationNormalStateImpl {
         }
         this.operationData.setCalculateLeftValue(calculate_result);
         this.operationData.setCalculateRightValue(0);
-        this.operationData.setCalculateResult(calculate_result);
         this.operationData.setDisplayText(String.valueOf(calculate_result));
     }
 }

@@ -47,7 +47,6 @@ class OperationNormalStateImpl implements OperationStateInterface {
         // set operation data.
         this.operationData.setDisplayText(current_text);
         this.operationData.setCalculateLeftValue(Integer.valueOf(current_text));
-        this.operationData.setCalculateResult(Integer.valueOf(current_text));
         this.operationData.setOperationNextState(OperationState.NORMAL);
         return true;
     }
@@ -103,7 +102,6 @@ class OperationNormalStateImpl implements OperationStateInterface {
         this.operationData.setDisplayText(ZERO);
         this.operationData.setCalculateLeftValue(0);
         this.operationData.setCalculateRightValue(0);
-        this.operationData.setCalculateResult(0);
     }
 
     /**
@@ -190,24 +188,6 @@ class OperationNormalStateImpl implements OperationStateInterface {
     }
 
     /**
-     * @brief Get Calculate Result.
-     *
-     * @return calculate result.
-     */
-    public int getCalculateResult() {
-        return this.operationData.getCalculateResult();
-    }
-
-    /**
-     * @brief Set Calculate Result.
-     *
-     * @param result calculate result.
-     */
-    public void setCalculateResult(int result) {
-        this.operationData.setCalculateResult(result);
-    }
-
-    /**
      * @brief Get Display Text String.
      *
      * @return display text string.
@@ -217,12 +197,30 @@ class OperationNormalStateImpl implements OperationStateInterface {
     }
 
     /**
+     * @brief Set Display Text.
+     *
+     * @param display_text display text.
+     */
+    public void setDisplayText(String display_text) {
+        this.operationData.setDisplayText(display_text);
+    }
+
+    /**
      * @brief Set Calculate Left Value.
      *
      * @param value integer value.
      */
     public void setCalculateLeftValue(int value) {
         this.operationData.setCalculateLeftValue(value);
+    }
+
+    /**
+     * @brief Get Calculate Result Value.
+     *
+     * @return  calculate result.
+     */
+    public int getCalculateResult() {
+        return this.operationData.getCalculateLeftValue();
     }
 
 }

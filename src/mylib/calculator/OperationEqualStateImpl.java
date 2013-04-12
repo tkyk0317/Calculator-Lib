@@ -42,7 +42,6 @@ class OperationEqualStateImpl extends OperationNormalStateImpl {
         // set operation data.
         this.operationData.setDisplayText(current_text);
         this.operationData.setCalculateLeftValue(Integer.valueOf(current_text));
-        this.operationData.setCalculateResult(Integer.valueOf(current_text));
         this.operationData.setOperationNextState(OperationState.NORMAL);
         return true;
     }

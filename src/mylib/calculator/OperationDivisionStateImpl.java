@@ -93,7 +93,7 @@ class OperationDivisionStateImpl extends OperationNormalStateImpl {
     public boolean clickDivisionEvent(CalculatorCell cell) {
         calculate();
         this.operationData.setOperationNextState(OperationState.DIVISION);
-        return false;
+        return true;
     }
 
     /**
@@ -121,7 +121,6 @@ class OperationDivisionStateImpl extends OperationNormalStateImpl {
         }
         this.operationData.setCalculateLeftValue(calculate_result);
         this.operationData.setCalculateRightValue(0);
-        this.operationData.setCalculateResult(calculate_result);
         this.operationData.setDisplayText(String.valueOf(calculate_result));
     }
 }

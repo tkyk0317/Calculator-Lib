@@ -80,7 +80,7 @@ class OperationMultipleStateImpl extends OperationNormalStateImpl {
     public boolean clickMultipleEvent(CalculatorCell cell) {
         calculate();
         this.operationData.setOperationNextState(OperationState.MULTIPLE);
-        return false;
+        return true;
     }
 
     /**
@@ -121,7 +121,6 @@ class OperationMultipleStateImpl extends OperationNormalStateImpl {
         }
         this.operationData.setCalculateLeftValue(calculate_result);
         this.operationData.setCalculateRightValue(0);
-        this.operationData.setCalculateResult(calculate_result);
         this.operationData.setDisplayText(String.valueOf(calculate_result));
     }
 }

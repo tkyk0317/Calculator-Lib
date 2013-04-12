@@ -93,8 +93,8 @@ public class Calculator implements ClickObserverInterface {
         displayInputValue(calculate_value);
         this.currentOperationState = this.normalOperationState;
         this.currentOperationState.clearAll();
-        this.currentOperationState.setCalculateResult(calculate_value);
         this.currentOperationState.setCalculateLeftValue(calculate_value);
+        this.currentOperationState.setDisplayText(String.valueOf(calculate_value));
 
         // show calculator.
         this.calculatorDialog.show();

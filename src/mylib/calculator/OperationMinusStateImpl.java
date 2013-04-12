@@ -67,7 +67,7 @@ class OperationMinusStateImpl extends OperationNormalStateImpl {
     public boolean clickMinusEvent(CalculatorCell cell) {
         calculate();
         this.operationData.setOperationNextState(OperationState.MINUS);
-        return false;
+        return true;
     }
 
     /**
@@ -121,7 +121,6 @@ class OperationMinusStateImpl extends OperationNormalStateImpl {
         }
         this.operationData.setCalculateLeftValue(calculate_result);
         this.operationData.setCalculateRightValue(0);
-        this.operationData.setCalculateResult(calculate_result);
         this.operationData.setDisplayText(String.valueOf(calculate_result));
     }
 }
