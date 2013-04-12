@@ -41,12 +41,13 @@ class OperationNormalStateImpl implements OperationStateInterface {
         // check valid value.
         if( false == isValidNumber(cell) ) return true;
 
-        String current_text = this.getDisplayText();
+        String current_text = String.valueOf(this.operationData.getCalculateLeftValue());
         current_text += cell.getButtonText();
 
         // set operation data.
         this.operationData.setDisplayText(current_text);
         this.operationData.setCalculateLeftValue(Integer.valueOf(current_text));
+        this.operationData.setCalculateResult(Integer.valueOf(current_text));
         this.operationData.setOperationNextState(OperationState.NORMAL);
         return true;
     }
@@ -98,10 +99,11 @@ class OperationNormalStateImpl implements OperationStateInterface {
     /**
      * @brief Clear All Value.
      */
-    protected void clearAll() {
+    public void clearAll() {
         this.operationData.setDisplayText(ZERO);
         this.operationData.setCalculateLeftValue(0);
         this.operationData.setCalculateRightValue(0);
+        this.operationData.setCalculateResult(0);
     }
 
     /**
@@ -188,21 +190,30 @@ class OperationNormalStateImpl implements OperationStateInterface {
     }
 
     /**
-     * @brief Get Display Text.
+     * @brief Get Calculate Result.
+     *
+     * @return calculate result.
+     */
+    public int getCalculateResult() {
+        return this.operationData.getCalculateResult();
+    }
+
+    /**
+     * @brief Set Calculate Result.
+     *
+     * @param result calculate result.
+     */
+    public void setCalculateResult(int result) {
+        this.operationData.setCalculateResult(result);
+    }
+
+    /**
+     * @brief Get Display Text String.
      *
      * @return display text string.
      */
     public String getDisplayText() {
         return this.operationData.getDisplayText();
-    }
-
-    /**
-     * @brief Set Display Text.
-     *
-     * @param display_text display text.
-     */
-    public void setDisplayText(String display_text) {
-        this.operationData.setDisplayText(display_text);
     }
 
     /**
@@ -214,11 +225,5 @@ class OperationNormalStateImpl implements OperationStateInterface {
         this.operationData.setCalculateLeftValue(value);
     }
 
-    /**
-     * @brief Clear Display Text.
-     */
-    public void clearDisplayText() {
-        this.operationData.setDisplayText(EMPTY);
-    }
 }
 

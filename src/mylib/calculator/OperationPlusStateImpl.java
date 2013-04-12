@@ -34,7 +34,7 @@ class OperationPlusStateImpl extends OperationNormalStateImpl {
         // check valid value.
         if( false == isValidNumber(cell) ) return true;
 
-        String current_text = this.getDisplayText();
+        String current_text = String.valueOf(this.operationData.getCalculateRightValue());
         current_text += cell.getButtonText();
 
         // set operation data.
@@ -110,6 +110,15 @@ class OperationPlusStateImpl extends OperationNormalStateImpl {
     }
 
     /**
+     * @brief Get Display Text String.
+     *
+     * @return display text string.
+     */
+    public String getDisplayText() {
+        return this.operationData.getDisplayText();
+    }
+
+    /**
      * @brief Calculate.
      */
     private void calculate() {
@@ -121,6 +130,7 @@ class OperationPlusStateImpl extends OperationNormalStateImpl {
         }
         this.operationData.setCalculateLeftValue(calculate_result);
         this.operationData.setCalculateRightValue(0);
+        this.operationData.setCalculateResult(calculate_result);
         this.operationData.setDisplayText(String.valueOf(calculate_result));
     }
 }

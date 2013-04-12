@@ -2,6 +2,7 @@ package com.mylib.calculator;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.lang.NumberFormatException;
 
 import android.util.Log;
 import android.app.Activity;
@@ -72,7 +73,6 @@ public class Calculator implements ClickObserverInterface {
      */
     public Calculator(Activity activity) {
         this.activity = activity;
-        this.currentOperationState = this.normalOperationState;
 
         // create resource.
         createCalculatorResources();
@@ -81,13 +81,20 @@ public class Calculator implements ClickObserverInterface {
     /**
      * @brief Appear the Calculator.
      */
-    public void appear(String calculate_value) {
-        // set intialize value.
-        if( calculate_value.length() > 0 ) {
-            this.currentOperationState.setCalculateLeftValue(Integer.valueOf(calculate_value));
+    public void appear(String appear_string) {
+        int calculate_value = 0;
+        try {
+            calculate_value = Integer.valueOf(appear_string);
+        } catch(NumberFormatException exception) {
+            calculate_value = 0;
         }
+
+        // set calculate value.
         displayInputValue(calculate_value);
-        this.currentOperationState.setDisplayText(calculate_value);
+        this.currentOperationState = this.normalOperationState;
+        this.currentOperationState.clearAll();
+        this.currentOperationState.setCalculateResult(calculate_value);
+        this.currentOperationState.setCalculateLeftValue(calculate_value);
 
         // show calculator.
         this.calculatorDialog.show();
@@ -101,13 +108,12 @@ public class Calculator implements ClickObserverInterface {
     }
 
     /**
-     * @brief Get Display Text.
+     * @brief Get Calculate Result Value.
      *
-     * @return display text string.
+     * @return calculate result value.
      */
-    public String getDisplayText() {
-        String calculate_value = this.calculatorEdit.getText().toString();
-        return calculate_value.replaceAll(CALCULATOR_MONEY_DELIMITER, "");
+    public int getCalculateResult() {
+        return this.currentOperationState.getCalculateResult();
     }
 
     /**
@@ -139,9 +145,6 @@ public class Calculator implements ClickObserverInterface {
 
         // set title.
         setCalculatorTitle(DEFAULT_TITLE);
-
-        // set default value.
-        displayInputValue(this.currentOperationState.getDisplayText());
 
         // add layout into dialog.
         this.calculatorDialog.setView(this.calculatorLayout);
@@ -217,15 +220,13 @@ public class Calculator implements ClickObserverInterface {
     public void notifyClick(Object event) {
         if( true == parseClickEvent((CalculatorCell)event) ) {
             // reflection display.
-            displayInputValue(this.currentOperationState.getDisplayText());
+            String display_text = this.currentOperationState.getDisplayText();
+            displayInputValue(Integer.valueOf(display_text));
 
             // notify observer.
             notifyObserver();
 
-            // clear innner display text value(ready next state).
-            if( true == isClearDisplayText((CalculatorCell)event) ) {
-                this.currentOperationState.clearDisplayText();
-            }
+            // transition state.
             transitionOperationState();
         }
     }
@@ -272,15 +273,11 @@ public class Calculator implements ClickObserverInterface {
     /**
      * @brief Display Input Value.
      *
-     * @param display_text displayed text string.
+     * @param calculate_result calculate result value.
      */
-    private void displayInputValue(String display_text) {
+    private void displayInputValue(int calculate_result) {
         // reflection edit text view.
-        if( display_text.length() > 0 ) {
-            this.calculatorEdit.setText(String.format("%,d", Integer.valueOf(display_text)));
-        } else {
-            this.calculatorEdit.setText(ZERO);
-        }
+        this.calculatorEdit.setText(String.format("%,d", calculate_result));
     }
 
     /**
@@ -288,22 +285,6 @@ public class Calculator implements ClickObserverInterface {
      */
     private void notifyObserver() {
         if( null != this.observer ) this.observer.notifyClick(this);
-    }
-
-    /**
-     * @brief Check Clear Display Text Timing.
-     */
-    private boolean isClearDisplayText(CalculatorCell cell) {
-        int id = cell.getId();
-
-        if( CalculatorCellId.ID_PLUS.getCellId() == id ||
-            CalculatorCellId.ID_MINUS.getCellId() == id ||
-            CalculatorCellId.ID_MULTIPLE.getCellId() == id ||
-            CalculatorCellId.ID_DIVISION.getCellId() == id ||
-            CalculatorCellId.ID_EQUAL.getCellId() == id ) {
-            return true;
-        }
-        return false;
     }
 
     /**

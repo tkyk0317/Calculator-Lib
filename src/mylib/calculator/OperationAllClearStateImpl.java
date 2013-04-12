@@ -32,12 +32,13 @@ class OperationAllClearStateImpl extends OperationNormalStateImpl {
         // checl valid number.
         if( false == isValidNumber(cell) ) return true;
 
-        String current_text = this.getDisplayText();
+        String current_text = String.valueOf(this.operationData.getCalculateLeftValue());
         current_text += cell.getButtonText();
 
         // set operation data.
         this.operationData.setDisplayText(current_text);
         this.operationData.setCalculateLeftValue(Integer.valueOf(current_text));
+        this.operationData.setCalculateResult(Integer.valueOf(current_text));
         this.operationData.setOperationNextState(OperationState.NORMAL);
         return true;
     }

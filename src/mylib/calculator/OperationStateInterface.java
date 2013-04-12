@@ -86,18 +86,25 @@ interface OperationStateInterface {
     public OperationState getNextState();
 
     /**
-     * @brief Get Display Text.
+     * @brief Get Calculate Result.
      *
-     * @return display text string.
+     * @return calculate result.
      */
-    public String getDisplayText();
+    public int getCalculateResult();
 
     /**
-     * @brief Set Display Text.
+     * @brief Set Calculate Result.
      *
-     * @param display_text display text.
+     * @param result calculate result.
      */
-    public void setDisplayText(String display_text);
+    public void setCalculateResult(int result);
+
+    /**
+     * @brief Get Display Text String.
+     *
+     * @return display text.
+     */
+    public String getDisplayText();
 
     /**
      * @brief Set Calculate Left Value.
@@ -107,8 +114,8 @@ interface OperationStateInterface {
     public void setCalculateLeftValue(int value);
 
     /**
-     * @brief Clear Display Text.
+     * @brief Clear All Value.
      */
-    public void clearDisplayText();
+    public void clearAll();
 }
 
