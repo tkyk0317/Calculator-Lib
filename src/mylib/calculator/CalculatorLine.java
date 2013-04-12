@@ -25,10 +25,10 @@ class CalculatorLine implements ClickObserverInterface {
     protected ClickObserverInterface observer = null;
     protected static final int CALCULATOR_BUTTON_WIDTH = 70;
     protected static final int CALCULATOR_BUTTON_TEXT_SIZE = 20;
-    private static final String BUTTON_TEXT_ONE = "1";
-    private static final String BUTTON_TEXT_TWO = "2";
-    private static final String BUTTON_TEXT_THREE = "3";
-    private static final String BUTTON_TEXT_PLUS = "＋";
+    private static final String BUTTON_TEXT_SEVEN = "7";
+    private static final String BUTTON_TEXT_EIGHT = "8";
+    private static final String BUTTON_TEXT_NINE = "9";
+    private static final String BUTTON_TEXT_DIVISION = "÷";
 
     /**
      * @brief Constractor.
@@ -117,20 +117,20 @@ class CalculatorLine implements ClickObserverInterface {
      * @brief Set Cells Id.
      */
     protected void setCellsId() {
-        this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setId(CalculatorCellId.ID_1.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setId(CalculatorCellId.ID_2.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setId(CalculatorCellId.ID_3.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_PLUS.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setId(CalculatorCellId.ID_7.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setId(CalculatorCellId.ID_8.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setId(CalculatorCellId.ID_9.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_DIVISION.getCellId());
     }
 
     /**
      * @brief Set Text on Button.
      */
     protected void setButtonText() {
-        this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setButtonText(BUTTON_TEXT_ONE);
-        this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setButtonText(BUTTON_TEXT_TWO);
-        this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setButtonText(BUTTON_TEXT_THREE);
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_PLUS);
+        this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setButtonText(BUTTON_TEXT_SEVEN);
+        this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setButtonText(BUTTON_TEXT_EIGHT);
+        this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setButtonText(BUTTON_TEXT_NINE);
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_DIVISION);
     }
 
     /**

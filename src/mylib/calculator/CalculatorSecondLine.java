@@ -19,7 +19,7 @@ class CalculatorSecondLine extends CalculatorLine {
     private static final String BUTTON_TEXT_FOUR = "4";
     private static final String BUTTON_TEXT_FIVE = "5";
     private static final String BUTTON_TEXT_SIX = "6";
-    private static final String BUTTON_TEXT_MINUS = "-";
+    private static final String BUTTON_TEXT_MULTIPLE = "×";
 
     /**
      * @brief Constractor.
@@ -49,7 +49,7 @@ class CalculatorSecondLine extends CalculatorLine {
         this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setId(CalculatorCellId.ID_4.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setId(CalculatorCellId.ID_5.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setId(CalculatorCellId.ID_6.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_MINUS.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_MULTIPLE.getCellId());
     }
 
     /**
@@ -59,7 +59,7 @@ class CalculatorSecondLine extends CalculatorLine {
         this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setButtonText(BUTTON_TEXT_FOUR);
         this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setButtonText(BUTTON_TEXT_FIVE);
         this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setButtonText(BUTTON_TEXT_SIX);
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_MINUS);
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_MULTIPLE);
     }
 }
 

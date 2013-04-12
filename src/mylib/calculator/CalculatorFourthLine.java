@@ -19,7 +19,7 @@ class CalculatorFourthLine extends CalculatorLine {
     private static final String BUTTON_TEXT_CLEAR = "C";
     private static final String BUTTON_TEXT_ZERO = "0";
     private static final String BUTTON_TEXT_DOUBLE_ZERO = "00";
-    private static final String BUTTON_TEXT_DIVISION = "÷";
+    private static final String BUTTON_TEXT_PLUS = "＋";
 
     /**
      * @brief Constractor.
@@ -49,7 +49,7 @@ class CalculatorFourthLine extends CalculatorLine {
         this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setId(CalculatorCellId.ID_CLEAR.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setId(CalculatorCellId.ID_ZERO.getCellId());
         this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setId(CalculatorCellId.ID_DOUBLE_ZERO.getCellId());
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_DIVISION.getCellId());
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setId(CalculatorCellId.ID_PLUS.getCellId());
     }
 
     /**
@@ -59,7 +59,7 @@ class CalculatorFourthLine extends CalculatorLine {
         this.calculatorCells.get(ButtonColmunIndex.ONE.getIndex()).setButtonText(BUTTON_TEXT_CLEAR);
         this.calculatorCells.get(ButtonColmunIndex.TWO.getIndex()).setButtonText(BUTTON_TEXT_ZERO);
         this.calculatorCells.get(ButtonColmunIndex.THREE.getIndex()).setButtonText(BUTTON_TEXT_DOUBLE_ZERO);
-        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_DIVISION);
+        this.calculatorCells.get(ButtonColmunIndex.FOUR.getIndex()).setButtonText(BUTTON_TEXT_PLUS);
     }
 
     /**
