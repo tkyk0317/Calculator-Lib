@@ -229,6 +229,10 @@ public class Calculator implements ClickObserverInterface {
             // transition state.
             transitionOperationState();
         }
+        // if clicked equal, close dialog.
+        if( this.currentOperationState == this.equalOperationState ) {
+            this.calculatorDialog.dismiss();
+        }
     }
 
     /**
